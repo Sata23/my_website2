@@ -1,0 +1,16 @@
+{
+  "name": "wwt-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "Free, open-source, real-time WhatsApp auto-reply agent for WibbleWobble Tech — same Q&A flow as the website's Santi assistant, answering on WhatsApp itself.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "pino": "^9.4.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
