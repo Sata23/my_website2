@@ -335,15 +335,7 @@
     .timezone-bar { background: var(--bg-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border: 1px solid var(--border); border-radius: 20px; padding: 28px; }
     .tz-row { display: flex; justify-content: space-between; font-size: 0.9rem; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
     .tz-row:last-child { border: none; }
-    .calendly-wrap { min-height: 200px; background: var(--bg-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-radius: 28px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; gap: 18px; }
-    .wa-quick-divider { display: flex; align-items: center; gap: 10px; width: 100%; color: var(--muted); font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; }
-    .wa-quick-divider::before, .wa-quick-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-    .wa-quick-title { display: flex; align-items: center; gap: 8px; color: var(--text); font-weight: 600; font-size: 0.9rem; }
-    .wa-quick-title i { color: #25D366; }
-    .wa-quick-sub { color: var(--muted); font-size: 0.8rem; margin-top: -8px; }
-    .wa-quick-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-    .wa-chip { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: rgba(37,211,102,0.06); color: var(--text); font-size: 0.78rem; text-decoration: none; transition: all 0.25s; }
-    .wa-chip:hover { border-color: #25D366; background: rgba(37,211,102,0.16); transform: translateY(-2px); }
+    .calendly-wrap { height: 200px; background: var(--bg-glass); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur); border-radius: 28px; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
     .yt-banner { background: linear-gradient(135deg,#111D35 0%,#0D1526 100%); border: 1px solid var(--border); border-radius: 24px; padding: 60px; display: flex; align-items: center; justify-content: space-between; overflow: hidden; position: relative; }
     .yt-banner::after { content: ''; position: absolute; top: -20%; right: -10%; width: 300px; height: 300px; background: rgba(255,0,0,0.05); filter: blur(60px); border-radius: 50%; z-index: 0; }
     .yt-info { position: relative; z-index: 1; max-width: 500px; }
@@ -489,6 +481,11 @@
       .loom-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     }
   </style>
+  <!-- LeadFlow integration update:
+       Existing site/chatbot retained.
+       Adds optional /api/events and /api/leads integration.
+       Configure API_BASE_URL near the bottom analytics script after backend deployment.
+       Never put OpenAI, Anthropic, Meta or database secrets in this HTML. -->
 </head>
 <body>
   <div class="blob-wrap">
@@ -529,7 +526,7 @@
           <li><a href="/dashboard" style="color:var(--electric);font-weight:700;"><i class="fas fa-terminal"></i> Controller</a></li>
         </ul>
         <div class="nav-cta">
-          <a href="https://wa.me/919620393657?text=Hi%20Santanu%21%20I%27m%20checking%20out%20the%20WibbleWobble%20Tech%20site%20and%20wanted%20to%20connect." class="btn btn-ghost" target="_blank">
+          <a href="https://wa.me/919620393657" class="btn btn-ghost" target="_blank">
             <i class="fab fa-whatsapp"></i> WhatsApp
           </a>
           <a href="#schedule" class="btn btn-primary" style="background:linear-gradient(135deg,var(--primary),var(--accent));">
@@ -1000,8 +997,7 @@
           <div class="project-thumb">🤖</div>
           <div class="project-body">
             <div class="project-title">Social Media Automation: Intelligent Engagement</div>
-            <p class="project-desc">AI-powered systems for content generation, scheduling, and community engagement across LinkedIn and X.</p>
-            <div class="project-tags"><span class="project-tag">LLM Integration</span><span class="project-tag">Auto-Posting</span><span class="project-tag">AI Search</span></div>
+            <p class="project-desc">AI-powered systems for content generation, scheduling, and community engagement across LinkedIn and X.</p>            <div class="project-tags"><span class="project-tag">LLM Integration</span><span class="project-tag">Auto-Posting</span><span class="project-tag">AI Search</span></div>
             <a href="#" class="project-link">View Case Study <i class="fas fa-arrow-right"></i></a>
           </div>
         </div>
@@ -1581,19 +1577,6 @@
           <a href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3KKH88CXeUFIKKK2BRKy_xbdGNijGGBzK8AObJi7WrT31lIBDHmZB2l2J8rPKSOBph1Xz1YSMa" target="_blank" class="btn btn-primary">
             <i class="far fa-calendar-check"></i> Book Now on Google Meet
           </a>
-
-          <div class="wa-quick-divider">or on WhatsApp</div>
-          <div class="wa-quick-title"><i class="fab fa-whatsapp"></i> Prefer WhatsApp?</div>
-          <div class="wa-quick-sub">Pick what you'd like to talk about — it opens WhatsApp with your topic already filled in.</div>
-          <div class="wa-quick-chips">
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20I%27d%20like%20to%20schedule%20a%20call%20to%20discuss%20building%20custom%20AI%20agents%20/%20LLM%20systems%20for%20my%20business.">🧠 AI Agents &amp; LLM Systems</a>
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20I%27d%20like%20to%20schedule%20a%20call%20about%20a%20RAG%20/%20document%20intelligence%20use%20case.">📄 RAG &amp; Document Intelligence</a>
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20I%27d%20like%20to%20schedule%20a%20call%20about%20automating%20manual%20operations%20and%20workflows.">⚙️ Automation &amp; Workflows</a>
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20I%27d%20like%20to%20schedule%20a%20call%20about%20building%20an%20MVP%20%E2%80%94%20could%20we%20go%20through%20my%20idea%3F">🚀 MVP / Product Build</a>
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20I%27d%20like%20to%20schedule%20a%20call%20about%20applying%20AI%20to%20my%20operations%20or%20supply%20chain.">🏭 AI for Ops / Supply Chain</a>
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20I%27d%20like%20to%20schedule%20a%20call%20about%20reducing%20costs%20with%20AI%20and%20cloud-native%20architecture.">💸 Cost Optimization</a>
-            <a class="wa-chip" target="_blank" href="https://wa.me/919620393657?text=Hi%20Santanu%2C%20before%20booking%20a%20call%20I%20have%20a%20quick%20question%20about%20your%20services.">🤔 Quick question first</a>
-          </div>
         </div>
       </div>
     </div>
@@ -1623,7 +1606,7 @@
         <p class="section-sub">Serious enquiries responded to within 24 hours.</p>
       </div>
       <div class="connect-grid">
-        <a href="https://wa.me/919620393657?text=Hi%20Santanu%21%20I%20came%20across%20your%20WibbleWobble%20Tech%20site%20and%20wanted%20to%20explore%20working%20together." target="_blank" class="connect-card whatsapp reveal">
+        <a href="https://wa.me/919620393657" target="_blank" class="connect-card whatsapp reveal">
           <div class="connect-icon"><i class="fab fa-whatsapp"></i></div>
           <div class="connect-name">WhatsApp</div>
           <span class="connect-action">Chat Now <i class="fas fa-arrow-right"></i></span>
@@ -1935,7 +1918,7 @@
   </footer>
 
   <!-- WhatsApp Float -->
-  <a href="https://wa.me/919620393657?text=Hi%20Santanu%21%20I%27d%20like%20to%20talk%20about%20AI%20or%20automation%20for%20my%20business%20%E2%80%94%20could%20we%20connect%3F" class="wa-float" target="_blank" title="Chat on WhatsApp">
+  <a href="https://wa.me/919620393657" class="wa-float" target="_blank" title="Chat on WhatsApp">
     <i class="fab fa-whatsapp"></i>
     <span class="wa-tooltip">Chat on WhatsApp</span>
   </a>
@@ -2013,8 +1996,7 @@
     }
     function closeLoomBtn() {
       const modal = document.getElementById('loomModal');
-      const frame = document.getElementById('loomModalFrame');
-      modal.classList.remove('active');
+      const frame = document.getElementById('loomModalFrame');      modal.classList.remove('active');
       frame.src = '';
       document.body.style.overflow = '';
     }
@@ -2153,40 +2135,7 @@
 
     const AVATAR = 'https://drive.google.com/thumbnail?id=1uHpvUrN3evahC2A-w7s82rZgUkoEqdp3&sz=w200';
     const MEET   = 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3KKH88CXeUFIKKK2BRKy_xbdGNijGGBzK8AObJi7WrT31lIBDHmZB2l2J8rPKSOBph1Xz1YSMa';
-    const WA_NUM = '919620393657';
-
-    // ── WHATSAPP HANDOFF ───────────────────────────────────────
-    // A wa.me link can't make WhatsApp itself "answer" — that only happens
-    // if Santanu configures a Greeting/Away message + Quick Replies inside
-    // his own WhatsApp Business app (client-side JS has no access to that).
-    // What we *can* do here: hand off a pre-filled, context-rich message so
-    // the conversation picks up exactly where Santi left off, instead of a
-    // blank chat window. Friendly labels for each step Santi asks about:
-    const FIELD_LABELS = {
-      start: 'I am', business_type: 'Business stage', challenge: 'Main challenge',
-      ai_detail: 'AI need', ops_detail: 'Ops pain point', data_detail: 'Data question',
-      mvp_detail: 'Product type', cost_detail: 'Cost pain point',
-      timeline: 'Timeline', budget: 'Budget',
-      hiring: 'Engagement type', hiring_detail: 'Engagement type',
-      collaborate: 'Collaboration interest'
-    };
-    function stripEmoji(s){ return s.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\uFE0F?\s?/gu, '').trim(); }
-    function buildWaLink(){
-      const keys = Object.keys(collecting);
-      let text;
-      if(keys.length){
-        const lines = keys
-          .filter(k => FIELD_LABELS[k])
-          .map(k => `• ${FIELD_LABELS[k]}: ${stripEmoji(collecting[k])}`);
-        text = "Hi Santanu! I just chatted with Santi (your AI assistant) on the WibbleWobble Tech site. Quick summary:\n"
-          + lines.join('\n')
-          + "\n\nI'd like to continue this on WhatsApp — when's a good time for a call?";
-      } else {
-        text = "Hi Santanu! I was exploring your AI assistant on the WibbleWobble Tech site and wanted to continue on WhatsApp.";
-      }
-      return 'https://wa.me/' + WA_NUM + '?text=' + encodeURIComponent(text);
-    }
-    const WA = 'https://wa.me/' + WA_NUM; // static fallback (used before any context exists)
+    const WA     = 'https://wa.me/919620393657';
 
     // ── CONVERSATION FLOW ──────────────────────────────────────
     // Each step: { id, bot (message), options[], freeText, next }
@@ -2332,9 +2281,7 @@
         ]
       },
       wa_direct: {
-        bot: function(){
-          return "Sure! Send a WhatsApp message directly — Santanu responds within 24 hours.<br><br><a href='" + buildWaLink() + "' target='_blank' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open WhatsApp</a>";
-        },
+        bot: "Sure! Send a WhatsApp message directly — Santanu responds within 24 hours.<br><br><a href='" + WA + "' target='_blank' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open WhatsApp</a>",
         options: [
           { label: "📅 Book a call instead", next: 'book_direct' },
           { label: "🔁 Start over",          next: 'start' },
@@ -2445,8 +2392,7 @@
       const delay = userLabel ? 700 + Math.random()*400 : 300;
       setTimeout(() => {
         removeTyping();
-        const botHtml = typeof step.bot === 'function' ? step.bot() : step.bot;
-        addBotMsg(botHtml);
+        addBotMsg(step.bot);
         if(step.options && step.options.length) renderOptions(step.options);
       }, delay);
     }
@@ -2454,6 +2400,26 @@
     function handleOption(opt){
       // Store selection for context
       collecting[currentStep] = opt.label;
+
+      // Mirror the qualification step to the LeadFlow backend when configured.
+      // The existing website chatbot remains fully functional if the backend is offline.
+      if (window.WWTTrack) {
+        window.WWTTrack('chatbot_step', {
+          step: currentStep,
+          selection: opt.label,
+          nextStep: opt.next,
+          qualification: Object.assign({}, collecting)
+        });
+      }
+
+      // Mark high-intent stages for funnel analytics.
+      if (window.WWTTrack && ['booking', 'book_direct', 'wa_direct', 'email_direct'].includes(opt.next)) {
+        window.WWTTrack('qualified_lead_intent', {
+          stage: opt.next,
+          qualification: Object.assign({}, collecting)
+        });
+      }
+
       goToStep(opt.next, opt.label);
     }
 
@@ -2584,6 +2550,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ---- 1. CONFIG ------------------------------------------------------
     var WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxYR3yymZjvlEgpc_kPQVSUODS1_lnntnsFCRc5emtCil7zpqkniHVZol8qXpXa6DLWpQ/exec';
+
+    // WibbleWobble LeadFlow backend.
+    // Replace this placeholder after your Node.js backend is deployed.
+    // Example: https://api.wibblwwobbleapp.com
+    var API_BASE_URL = 'https://YOUR-BACKEND-DOMAIN';
+
     var POPUP_DELAY_MS = 20000;
     var EXIT_INTENT_ENABLED = true;
 
@@ -2636,6 +2608,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } catch (e) { /* never let tracking break the page */ }
     }
+
+    // ---- 4B. WIBBLEWOBBLE BACKEND ---------------------------------------------
+    function backendConfigured() {
+      return API_BASE_URL &&
+             API_BASE_URL.indexOf('YOUR-BACKEND-DOMAIN') === -1;
+    }
+
+    function backendPayload(event, extra) {
+      return Object.assign({
+        event: event,
+        sessionId: sessionId,
+        page: window.location.pathname + window.location.hash,
+        landingPage: window.location.href,
+        referrer: document.referrer,
+        utmSource: getParam('utm_source'),
+        utmMedium: getParam('utm_medium'),
+        utmCampaign: getParam('utm_campaign'),
+        utmContent: getParam('utm_content'),
+        source: 'website',
+        timestamp: new Date().toISOString()
+      }, extra || {});
+    }
+
+    function sendBackendEvent(event, extra) {
+      if (!backendConfigured()) return Promise.resolve(null);
+
+      return fetch(API_BASE_URL.replace(/\/$/, '') + '/api/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(backendPayload(event, extra))
+      }).catch(function () {
+        // Tracking must never break the website.
+        return null;
+      });
+    }
+
+    function sendLeadToBackend(extra) {
+      if (!backendConfigured()) return Promise.resolve({ skipped: true });
+
+      var payload = Object.assign({
+        source: 'website',
+        landingPage: window.location.href,
+        referrer: document.referrer,
+        utmSource: getParam('utm_source'),
+        utmMedium: getParam('utm_medium'),
+        utmCampaign: getParam('utm_campaign'),
+        utmContent: getParam('utm_content')
+      }, extra || {});
+
+      return fetch(API_BASE_URL.replace(/\/$/, '') + '/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (response) {
+        if (!response.ok) throw new Error('Lead API returned ' + response.status);
+        return response.json();
+      });
+    }
+
+    // Expose only safe helper functions to the separate website-chatbot script.
+    // No API keys or server secrets are present in browser code.
+    window.WWTTrack = sendBackendEvent;
+    window.WWTLead = sendLeadToBackend;
 
     // ---- 5. PAGEVIEW ----------------------------------------------------------
     send('pageview');
@@ -2710,15 +2745,53 @@ document.addEventListener('DOMContentLoaded', () => {
         send('popup_dismissed');
         closePopup();
       });
-      wrap.querySelector('#wwt-popup-form').addEventListener('submit', function (e) {
+      wrap.querySelector('#wwt-popup-form').addEventListener('submit', async function (e) {
         e.preventDefault();
+
         var email = document.getElementById('wwt-popup-email').value.trim();
         var phone = document.getElementById('wwt-popup-phone').value.trim();
+        var submitButton = wrap.querySelector('#wwt-popup-form button[type=submit]');
+
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Submitting...';
+        }
+
+        // Preserve the existing Google Apps Script analytics event.
         send('lead_captured', { email: email, phone: phone });
-        localStorage.setItem('wwt_lead_captured', '1');
-        wrap.querySelector('.wwt-popup-card').innerHTML =
-          '<h3>Thanks!</h3><p>Your AI Opportunity Map is on its way — Santanu will also review it personally.</p>';
-        setTimeout(closePopup, 2500);
+
+        try {
+          if (window.WWTLead) {
+            await window.WWTLead({
+              email: email,
+              phone: phone,
+              interest: 'AI Opportunity Map',
+              requirement: 'Requested AI Opportunity Map from website popup',
+              source: 'website_popup'
+            });
+          }
+
+          localStorage.setItem('wwt_lead_captured', '1');
+          wrap.querySelector('.wwt-popup-card').innerHTML =
+            '<h3>Thanks!</h3><p>Your request has been received. Santanu will review it personally.</p>';
+          setTimeout(closePopup, 2500);
+
+        } catch (error) {
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Send me the map';
+          }
+
+          var existingError = wrap.querySelector('.wwt-popup-error');
+          if (!existingError) {
+            var errorText = document.createElement('p');
+            errorText.className = 'wwt-popup-error';
+            errorText.style.color = '#dc2626';
+            errorText.style.marginTop = '10px';
+            errorText.textContent = 'Unable to submit right now. Please try again or contact us on WhatsApp.';
+            wrap.querySelector('.wwt-popup-card').appendChild(errorText);
+          }
+        }
       });
     }
 
