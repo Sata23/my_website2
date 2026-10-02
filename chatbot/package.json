@@ -1,16 +1,21 @@
 {
-  "name": "wwt-whatsapp-bot",
+  "name": "wibblewobble-leadflow",
   "version": "1.0.0",
-  "description": "Free, open-source, real-time WhatsApp auto-reply agent for WibbleWobble Tech — same Q&A flow as the website's Santi assistant, answering on WhatsApp itself.",
+  "description": "Website lead capture and Meta WhatsApp Cloud API chatbot with OpenAI and Claude",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "node --watch index.js"
   },
-  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
-    "@whiskeysockets/baileys": "^6.7.9",
-    "pino": "^9.4.0",
-    "qrcode-terminal": "^0.12.0"
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "pg": "^8.13.1"
   }
 }
