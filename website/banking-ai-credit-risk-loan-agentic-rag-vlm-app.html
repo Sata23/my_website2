@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Banking AI Credit Risk & Loan Advisor - RAG + LLM + VLM</title>
+  <style>
+    :root {
+      --bg: #f5f8fc;
+      --panel: #ffffff;
+      --panel-2: #eef5fb;
+      --ink: #122033;
+      --muted: #5a6b80;
+      --line: #d7e3ee;
+      --blue: #0a5ea8;
+      --blue-dark: #073a68;
+      --teal: #0c8b83;
+      --green: #18865b;
+      --amber: #b7791f;
+      --red: #c24141;
+      --shadow: 0 18px 42px rgba(21, 45, 80, .10);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      letter-spacing: 0;
+    }
+
+    header {
+      background: linear-gradient(135deg, #ffffff 0%, #edf6ff 100%);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 22px;
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) auto;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0a5ea8, #0c8b83);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.15;
+      color: var(--blue-dark);
+    }
+
+    .subtitle {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--blue-dark);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 18px 22px 32px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: 17px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      color: var(--blue-dark);
+      font-size: 14px;
+    }
+
+    p {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.45;
+      font-size: 13px;
+    }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 1.1fr .8fr 1.1fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .arch-column {
+      display: grid;
+      gap: 9px;
+    }
+
+    .arch-card {
+      border: 1px solid #cfe0ef;
+      background: #fbfdff;
+      border-radius: 8px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 9px;
+      min-height: 72px;
+      position: relative;
+    }
+
+    .arch-card::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 22px;
+      width: 2px;
+      height: 9px;
+      background: #9dc8ea;
+    }
+
+    .arch-column .arch-card:last-child::after { display: none; }
+
+    .num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .arch-card strong {
+      display: block;
+      font-size: 13px;
+      color: var(--blue-dark);
+      margin-bottom: 3px;
+    }
+
+    .arch-card span {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .center-flow {
+      background: #f8fbff;
+      border: 1px solid #d6e6f2;
+      border-radius: 8px;
+      padding: 12px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .flow-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid #dbe8f2;
+      padding-bottom: 8px;
+    }
+
+    .flow-step:last-child { border-bottom: 0; padding-bottom: 0; }
+    .flow-step .num { background: var(--teal); }
+    .flow-step b { font-size: 12px; color: var(--blue-dark); }
+    .flow-step small { display: block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+    .grid-main {
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr) 340px;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--blue-dark);
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #c9d8e8;
+      background: #fff;
+      color: var(--ink);
+      border-radius: 7px;
+      padding: 9px 10px;
+      font: inherit;
+      font-size: 13px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(10, 94, 168, .12);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      border: 0;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 7px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    button.secondary {
+      background: #e9f2fb;
+      color: var(--blue-dark);
+      border: 1px solid #c9d8e8;
+    }
+
+    button.warn { background: var(--amber); }
+
+    .source-list, .event-log {
+      display: grid;
+      gap: 8px;
+      max-height: 316px;
+      overflow: auto;
+      padding-right: 3px;
+    }
+
+    .source {
+      border: 1px solid #d9e5ef;
+      border-radius: 7px;
+      background: #fbfdff;
+      padding: 9px;
+    }
+
+    .source b {
+      color: var(--blue-dark);
+      display: block;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .source small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .chat {
+      min-height: 680px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+    }
+
+    .chat-window {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #fbfdff 0%, #f6f9fc 100%);
+      border-radius: 8px;
+      padding: 12px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 390px;
+      max-height: 520px;
+    }
+
+    .msg {
+      max-width: 86%;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.45;
+      border: 1px solid var(--line);
+      background: #fff;
+      white-space: pre-wrap;
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: #e8f3ff;
+      border-color: #bed8f0;
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+    }
+
+    .msg .meta {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .composer {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 9px;
+    }
+
+    .risk-board {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      background: #fbfdff;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      color: var(--blue-dark);
+      margin-bottom: 2px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .flag {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      margin: 3px 4px 3px 0;
+    }
+
+    .ok { background: #e8f8ef; color: var(--green); border: 1px solid #bde8ce; }
+    .watch { background: #fff6df; color: var(--amber); border: 1px solid #f0d69a; }
+    .bad { background: #fff0f0; color: var(--red); border: 1px solid #f2bcbc; }
+
+    .api-box {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      color: #0f2d4a;
+      background: #f7fbff;
+      border: 1px solid #d7e6f2;
+      border-radius: 7px;
+      padding: 10px;
+      overflow: auto;
+      max-height: 178px;
+      white-space: pre-wrap;
+    }
+
+    .dropzone {
+      border: 1px dashed #9bbbd7;
+      background: #fbfdff;
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .file-preview {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .file-item {
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 8px;
+      align-items: center;
+      text-align: left;
+      padding: 8px;
+      border: 1px solid #d7e6f2;
+      border-radius: 7px;
+      background: #fff;
+    }
+
+    .thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      background: #e8f3ff;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--blue);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .tiny {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    @media (max-width: 1120px) {
+      .architecture, .grid-main { grid-template-columns: 1fr; }
+      .risk-board { grid-template-columns: repeat(2, 1fr); }
+      .topbar { grid-template-columns: 1fr; }
+      .status-strip { justify-content: flex-start; }
+    }
+
+    @media (max-width: 640px) {
+      main, .topbar { padding-left: 12px; padding-right: 12px; }
+      .form-grid, .risk-board { grid-template-columns: 1fr; }
+      h1 { font-size: 18px; }
+      .msg { max-width: 100%; }
+      .composer { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">BAI</div>
+        <div>
+          <h1>Banking AI Credit Risk Analyzer & Loan Advisor</h1>
+          <p class="subtitle">Agentic RAG + LLM + VLM assistant for retail and HNI banking services</p>
+        </div>
+      </div>
+      <div class="status-strip">
+        <span class="chip">OpenAI / Claude ready</span>
+        <span class="chip">KYC + Transaction Intelligence</span>
+        <span class="chip">Fraud + Anomaly Detection</span>
+        <span class="chip">PDF, Excel, PPT, Image intake</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="section-title">
+        <div>
+          <h2>AI Architecture: RAG + LLM + VLM + Agentic Banking Workflow</h2>
+          <p>Reference architecture for governed banking decisions. The model assists and recommends; final credit approval remains policy-controlled with human review for high-risk cases.</p>
+        </div>
+        <span class="chip">Designed for CTO / Risk / Product review</span>
+      </div>
+
+      <div class="architecture">
+        <div class="arch-column">
+          <div class="arch-card"><div class="num">1</div><div><strong>Experience Layer</strong><span>Retail/HNI chatbot, relationship-manager console, loan officer workspace, risk dashboard and mobile banking entry points.</span></div></div>
+          <div class="arch-card"><div class="num">2</div><div><strong>Secure API + Identity Layer</strong><span>API Gateway, OAuth/OIDC, consent capture, RBAC, customer segmentation, rate limits and audit headers.</span></div></div>
+          <div class="arch-card"><div class="num">3</div><div><strong>Document + Image Intake</strong><span>PDFs, bank statements, salary slips, PAN/Aadhaar-like KYC, Excel portfolios, PPT proposals, screenshots, images and scanned forms.</span></div></div>
+          <div class="arch-card"><div class="num">4</div><div><strong>Cloud Extraction API</strong><span>Signed upload URL or ingestion endpoint extracts text, tables, image objects, metadata and OCR/VLM descriptions into cloud storage.</span></div></div>
+          <div class="arch-card"><div class="num">5</div><div><strong>Banking Source Systems</strong><span>Core banking, CRM, LOS/LMS, KYC/CDD, bureau/CIBIL-like feeds, card/UPI transactions, AML/fraud monitoring and customer service logs.</span></div></div>
+        </div>
+
+        <div class="center-flow">
+          <h3>Shared Agentic Flow</h3>
+          <div class="flow-step"><div class="num">1</div><div><b>Classify intent</b><small>Loan eligibility, credit risk, fraud alert, KYC gap, HNI portfolio, service request or document analysis.</small></div></div>
+          <div class="flow-step"><div class="num">2</div><div><b>Extract and normalize</b><small>OCR/VLM, table extraction, entity recognition, customer matching and document quality checks.</small></div></div>
+          <div class="flow-step"><div class="num">3</div><div><b>Retrieve evidence</b><small>RAG over policy, product rules, KYC checklist, risk policy, pricing grid and historical customer signals.</small></div></div>
+          <div class="flow-step"><div class="num">4</div><div><b>Run specialist agents</b><small>Credit risk, affordability, fraud, anomaly, KYC, loan product, HNI advisory and compliance agents.</small></div></div>
+          <div class="flow-step"><div class="num">5</div><div><b>Score and recommend</b><small>Risk grade, eligible products, max ticket size, interest band, collateral need and manual review trigger.</small></div></div>
+          <div class="flow-step"><div class="num">6</div><div><b>Govern and learn</b><small>Human review, reason codes, drift checks, hallucination tests, prompt logs and feedback into evaluation sets.</small></div></div>
+        </div>
+
+        <div class="arch-column">
+          <div class="arch-card"><div class="num">6</div><div><strong>RAG + Knowledge Layer</strong><span>Policy chunks, embeddings, vector search, reranking, access filters, citations, product rules and customer-safe summaries.</span></div></div>
+          <div class="arch-card"><div class="num">7</div><div><strong>LLM Reasoning Layer</strong><span>OpenAI or Claude produces grounded explanations, customer-facing responses, banker notes and reason-code narratives.</span></div></div>
+          <div class="arch-card"><div class="num">8</div><div><strong>VLM Layer</strong><span>Vision model reads screenshots, uploaded identity images, statement screenshots, collateral photos and scanned document layouts.</span></div></div>
+          <div class="arch-card"><div class="num">9</div><div><strong>Risk + Decision Services</strong><span>Deterministic policy engine for DTI, bureau score, suspicious activity, anomaly detection, delinquency, affordability and exceptions.</span></div></div>
+          <div class="arch-card"><div class="num">10</div><div><strong>Controls + Observability</strong><span>PII masking, encryption, prompt-injection checks, consent, model evaluation, latency/cost monitoring, audit trail and reviewer queue.</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid-main">
+      <aside class="stack">
+        <section class="section">
+          <h2>Customer Profile</h2>
+          <div class="form-grid" style="margin-top:12px;">
+            <div><label for="customerType">Customer type</label><select id="customerType"><option>Retail</option><option selected>HNI</option><option>SME Owner</option></select></div>
+            <div><label for="loanType">Loan need</label><select id="loanType"><option>Home Loan</option><option selected>Personal Loan</option><option>Loan Against Securities</option><option>Business Loan</option><option>Vehicle Loan</option></select></div>
+            <div><label for="income">Monthly income</label><input id="income" type="number" value="425000" /></div>
+            <div><label for="emi">Existing EMI</label><input id="emi" type="number" value="86000" /></div>
+            <div><label for="bureau">Bureau score</label><input id="bureau" type="number" value="768" /></div>
+            <div><label for="ticket">Requested amount</label><input id="ticket" type="number" value="2500000" /></div>
+          </div>
+          <div style="margin-top:10px;">
+            <label for="notes">Transaction / KYC notes</label>
+            <textarea id="notes">Customer has stable salary credits, high card utilization for last 2 months, two large inward transfers, updated PAN, address proof pending refresh, no recent delinquency.</textarea>
+          </div>
+          <div class="btn-row" style="margin-top:10px;">
+            <button id="analyzeBtn">Run Credit + Fraud Analysis</button>
+            <button class="secondary" id="seedBtn">Load Retail Sample</button>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Upload Files for VLM / Extraction</h2>
+          <p class="tiny" style="margin:7px 0 9px;">Upload PDFs, Excel, PPT, statement screenshots or images. This interactive demo uses local simulation only: documents are not processed by a real cloud model or uploaded to a server.</p>
+          <div class="dropzone">
+            <input id="fileInput" type="file" multiple accept=".pdf,.xlsx,.xls,.ppt,.pptx,.csv,.txt,.png,.jpg,.jpeg,.webp" />
+            <div class="file-preview" id="filePreview"></div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="section chat">
+        <div class="section-title">
+          <div>
+            <h2>Agentic Banking Chatbot</h2>
+            <p>Ask about loan eligibility, missing KYC, fraud signals, uploaded documents, HNI recommendations or next best action.</p>
+          </div>
+          <span class="chip" id="intentChip">Intent: Ready</span>
+        </div>
+        <div class="chat-window" id="chatWindow"></div>
+        <div class="composer">
+          <textarea id="prompt" placeholder="Ask: Can this HNI customer get a personal loan? Explain credit risk, fraud flags, missing KYC and next best offer."></textarea>
+          <div class="btn-row" style="align-content:start;">
+            <button id="sendBtn">Ask</button>
+            <button class="secondary" id="clearBtn">Clear</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="stack">
+        <section class="section">
+          <h2>Decision Dashboard</h2>
+          <div class="risk-board" style="margin-top:12px;">
+            <div class="metric"><strong id="riskScore">--</strong><span>Risk score</span></div>
+            <div class="metric"><strong id="eligibleAmount">--</strong><span>Eligible amount</span></div>
+            <div class="metric"><strong id="dti">--</strong><span>Debt-to-income</span></div>
+            <div class="metric"><strong id="fraudScore">--</strong><span>Fraud score</span></div>
+          </div>
+          <div id="flags" style="margin-top:10px;"></div>
+        </section>
+
+        <section class="section">
+          <h2>Dummy Knowledge Base</h2>
+          <div class="source-list" id="sourceList"></div>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="secondary" id="downloadKbBtn">Download KB JSON</button>
+          </div>
+          <div style="margin-top:12px;">
+            <h3>Source files</h3>
+            <div class="source-list" style="max-height:none;">
+              <div class="source"><b>Knowledge Base JSON</b><small><a href="./banking-ai-dummy-knowledge-base.json" download>banking-ai-dummy-knowledge-base.json</a></small></div>
+              <div class="source"><b>Sample Transactions CSV</b><small><a href="./banking-ai-sample-transactions.csv" download>banking-ai-sample-transactions.csv</a></small></div>
+              <div class="source"><b>KYC Policy Text</b><small><a href="./banking-ai-kyc-policy-sample.txt" download>banking-ai-kyc-policy-sample.txt</a></small></div>
+              <div class="source"><b>Cloud API Contract</b><small><a href="./banking-ai-cloud-ingestion-api-sample.json" download>banking-ai-cloud-ingestion-api-sample.json</a></small></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2>Cloud Ingestion API</h2>
+          <div class="form-grid" style="margin-top:12px;">
+            <div><label for="cloud">Provider</label><select id="cloud"><option>AWS S3</option><option>GCP Cloud Storage</option><option>Azure Blob</option></select></div>
+            <div><label for="region">Region</label><input id="region" value="ap-south-1" /></div>
+          </div>
+          <div style="margin-top:9px;"><label for="endpoint">API endpoint</label><input id="endpoint" value="https://api.bank-ai.example/v1/ingest/signed-upload" /></div>
+          <div class="btn-row" style="margin-top:10px;">
+            <button id="apiBtn">Generate API Payload</button>
+            <button class="secondary" id="copyApiBtn">Copy</button>
+          </div>
+          <pre class="api-box" id="apiBox"></pre>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const kb = [
+      {
+        id: "POL-001",
+        title: "Retail Personal Loan Eligibility Policy",
+        type: "Policy PDF",
+        text: "Minimum bureau score 700 preferred. Debt-to-income below 45% is green, 45-55% is watch, above 55% needs manual review. Address proof and PAN must be current. High utilization reduces approved ticket."
+      },
+      {
+        id: "POL-002",
+        title: "HNI Relationship Credit Policy",
+        type: "Wealth Policy",
+        text: "HNI customers may receive relationship pricing if AUM exceeds threshold and portfolio risk is moderate. Loan against securities can be offered when unsecured exposure is constrained."
+      },
+      {
+        id: "FRD-101",
+        title: "Fraud and Anomaly Monitoring Rules",
+        type: "Risk Rules",
+        text: "Flag sudden large inward transfers, repeated failed login attempts, device change, unusual merchant category spend, newly linked beneficiary, multiple loan enquiries and document mismatch."
+      },
+      {
+        id: "KYC-210",
+        title: "KYC and CDD Checklist",
+        type: "Checklist",
+        text: "PAN, address proof, identity proof, income proof, source of funds and beneficial ownership must be validated. Stale address proof must be refreshed before disbursal."
+      },
+      {
+        id: "PRD-330",
+        title: "Loan Product Matrix",
+        type: "Product Excel",
+        text: "Personal loan suits salaried customers with strong score and stable cashflow. Loan against securities suits HNI customers with high AUM and temporary liquidity need. Home loan requires collateral valuation."
+      },
+      {
+        id: "OPS-430",
+        title: "Human Review and Exception Workflow",
+        type: "SOP",
+        text: "Any high fraud score, DTI above threshold, incomplete KYC, suspicious transfer or conflicting document evidence should route to credit officer and fraud operations queue."
+      }
+    ];
+
+    const state = {
+      files: [],
+      lastAnalysis: null,
+      messages: []
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    function money(n) {
+      return "₹" + Math.round(n).toLocaleString("en-IN");
+    }
+
+    function addMessage(role, text) {
+      const div = document.createElement("div");
+      div.className = "msg " + role;
+      div.innerHTML = `<span class="meta">${role === "user" ? "Customer / Banker" : "Banking AI Assistant"}</span>${escapeHtml(text)}`;
+      $("chatWindow").appendChild(div);
+      $("chatWindow").scrollTop = $("chatWindow").scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function classifyIntent(text) {
+      const t = text.toLowerCase();
+      if (/(fraud|anomal|suspicious|aml|risk flag)/.test(t)) return "Fraud & anomaly investigation";
+      if (/(kyc|document|address|pan|aadhaar|identity|proof)/.test(t)) return "KYC and document validation";
+      if (/(hni|portfolio|wealth|securities|aum)/.test(t)) return "HNI relationship advisory";
+      if (/(loan|eligib|approve|credit|underwrit|emi|dti)/.test(t)) return "Credit risk and loan recommendation";
+      if (/(image|screenshot|pdf|excel|ppt|file|upload)/.test(t)) return "Document and image analysis";
+      return "General banking service request";
+    }
+
+    function retrieveDocs(intent, notes) {
+      const query = (intent + " " + notes).toLowerCase();
+      return kb
+        .map(doc => {
+          const hay = (doc.title + " " + doc.type + " " + doc.text).toLowerCase();
+          const score = query.split(/\W+/).filter(w => w.length > 3 && hay.includes(w)).length;
+          return { ...doc, score };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4);
+    }
+
+    function analyzeCustomer() {
+      const income = Number($("income").value || 0);
+      const emi = Number($("emi").value || 0);
+      const bureau = Number($("bureau").value || 0);
+      const ticket = Number($("ticket").value || 0);
+      const notes = $("notes").value.toLowerCase();
+      const dti = income ? emi / income : 0;
+      let risk = 50;
+      risk -= Math.max(0, bureau - 700) * 0.12;
+      risk += Math.max(0, 700 - bureau) * 0.18;
+      risk += dti > 0.55 ? 22 : dti > 0.45 ? 12 : -8;
+      risk += /high card utilization|large inward|address proof pending|multiple loan/.test(notes) ? 13 : 0;
+      risk += /delinquency|bounce|chargeback|new beneficiary|device change/.test(notes) ? 20 : 0;
+      risk = Math.max(8, Math.min(95, Math.round(risk)));
+
+      let fraud = 18;
+      if (/large inward/.test(notes)) fraud += 18;
+      if (/device change|new beneficiary|failed login/.test(notes)) fraud += 25;
+      if (/document mismatch|conflicting/.test(notes)) fraud += 22;
+      if (/no recent delinquency/.test(notes)) fraud -= 5;
+      fraud = Math.max(5, Math.min(95, fraud));
+
+      const multiplier = bureau >= 760 && dti < 0.45 ? 9 : bureau >= 720 ? 6 : 3.5;
+      const eligible = Math.min(ticket, Math.max(0, income * multiplier - emi * 10));
+      const rate = risk < 30 ? "10.5% - 12.0%" : risk < 55 ? "12.5% - 15.5%" : "Manual pricing";
+      const grade = risk < 30 ? "A / Low" : risk < 55 ? "B / Moderate" : "C / High";
+
+      const flags = [];
+      if (dti > 0.45) flags.push({ cls: "watch", text: "DTI watch" });
+      if (bureau < 700) flags.push({ cls: "bad", text: "Bureau below policy" });
+      if (/address proof pending/.test(notes)) flags.push({ cls: "watch", text: "KYC refresh required" });
+      if (/large inward/.test(notes)) flags.push({ cls: "watch", text: "Large transfer review" });
+      if (fraud > 60) flags.push({ cls: "bad", text: "Fraud ops review" });
+      if (eligible >= ticket && risk < 55) flags.push({ cls: "ok", text: "Eligible with conditions" });
+      if (flags.length === 0) flags.push({ cls: "ok", text: "No material red flag" });
+
+      state.lastAnalysis = { income, emi, bureau, ticket, dti, risk, fraud, eligible, rate, grade, flags };
+      renderDashboard();
+      return state.lastAnalysis;
+    }
+
+    function renderDashboard() {
+      const a = state.lastAnalysis || analyzeCustomer();
+      $("riskScore").textContent = a.grade;
+      $("eligibleAmount").textContent = money(a.eligible);
+      $("dti").textContent = Math.round(a.dti * 100) + "%";
+      $("fraudScore").textContent = a.fraud + "/100";
+      $("flags").innerHTML = a.flags.map(f => `<span class="flag ${f.cls}">${escapeHtml(f.text)}</span>`).join("");
+    }
+
+    function answer(prompt) {
+      const intent = classifyIntent(prompt);
+      $("intentChip").textContent = "Intent: " + intent;
+      const a = analyzeCustomer();
+      const docs = retrieveDocs(intent, $("notes").value + " " + prompt);
+      const fileSummary = state.files.length
+        ? `\n\nUploaded evidence considered: ${state.files.map(f => `${f.name} (${f.kind})`).join(", ")}. VLM/OCR simulation found statement/document evidence requiring source verification before final approval.`
+        : "";
+      const recommendation = a.risk < 30 && a.fraud < 45 && a.eligible >= a.ticket
+        ? "Recommend conditional approval with standard verification and relationship pricing review."
+        : a.risk < 55 && a.fraud < 60
+          ? "Recommend conditional approval at moderate pricing after KYC refresh and transaction explanation."
+          : "Do not auto-approve. Route to credit officer and fraud/compliance review.";
+
+      return `Intent classified as: ${intent}
+
+Credit view:
+- Risk grade: ${a.grade}
+- Estimated eligible amount: ${money(a.eligible)}
+- Requested amount: ${money(a.ticket)}
+- Debt-to-income: ${Math.round(a.dti * 100)}%
+- Fraud/anomaly score: ${a.fraud}/100
+- Indicative pricing: ${a.rate}
+
+Recommendation:
+${recommendation}
+
+Reason codes:
+${a.flags.map(f => "- " + f.text).join("\n")}
+
+Retrieved policy evidence:
+${docs.map(d => `- [${d.id}] ${d.title}: ${d.text}`).join("\n")}
+
+Next best actions:
+- Refresh pending KYC documents before disbursal.
+- Ask customer to explain large inward transfers and source of funds.
+- Offer loan-against-securities alternative if unsecured exposure is constrained.
+- Route high-risk or conflicting evidence to human credit/fraud review.${fileSummary}`;
+    }
+
+    function renderSources() {
+      $("sourceList").innerHTML = kb.map(doc => `
+        <div class="source">
+          <b>${escapeHtml(doc.id)} · ${escapeHtml(doc.title)}</b>
+          <small>${escapeHtml(doc.type)} · ${escapeHtml(doc.text)}</small>
+        </div>
+      `).join("");
+    }
+
+    function handleFiles(files) {
+      [...files].forEach(file => {
+        const item = { name: file.name, size: file.size, type: file.type || "unknown", kind: classifyFile(file), preview: null };
+        state.files.push(item);
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = e => { item.preview = e.target.result; renderFiles(); };
+          reader.readAsDataURL(file);
+        }
+      });
+      renderFiles();
+      generateApiPayload();
+    }
+
+    function classifyFile(file) {
+      const name = file.name.toLowerCase();
+      if (file.type.startsWith("image/")) return "Image / screenshot for VLM";
+      if (name.endsWith(".pdf")) return "PDF for OCR + RAG";
+      if (name.endsWith(".xlsx") || name.endsWith(".xls") || name.endsWith(".csv")) return "Spreadsheet for table extraction";
+      if (name.endsWith(".ppt") || name.endsWith(".pptx")) return "Presentation for slide extraction";
+      return "Document for text extraction";
+    }
+
+    function renderFiles() {
+      $("filePreview").innerHTML = state.files.map((file, i) => `
+        <div class="file-item">
+          <div class="thumb">${file.preview ? `<img alt="" src="${file.preview}">` : "FILE"}</div>
+          <div>
+            <b style="font-size:12px;color:var(--blue-dark);">${escapeHtml(file.name)}</b>
+            <div class="tiny">${escapeHtml(file.kind)} · ${(file.size / 1024).toFixed(1)} KB · extraction job ${String(i + 1).padStart(3, "0")}</div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function generateApiPayload() {
+      const provider = $("cloud").value;
+      const region = $("region").value;
+      const endpoint = $("endpoint").value;
+      const payload = {
+        method: "POST",
+        endpoint,
+        purpose: "extract-upload-index",
+        provider,
+        region,
+        target_bucket: provider === "AWS S3" ? "s3://bank-ai-credit-risk/raw/" : provider === "GCP Cloud Storage" ? "gs://bank-ai-credit-risk/raw/" : "azure://bank-ai-credit-risk/raw/",
+        extraction_pipeline: ["virus_scan", "pii_detection", "ocr", "vlm_captioning", "table_extraction", "entity_extraction", "chunking", "embedding", "vector_index"],
+        accepted_files: state.files.map(f => ({ name: f.name, type: f.type, interpretation: f.kind })),
+        metadata: {
+          customer_type: $("customerType").value,
+          loan_type: $("loanType").value,
+          consent_id: "demo-consent-kyc-credit-risk-001",
+          retention_policy: "banking-risk-review-90-days",
+          encryption: "kms-managed",
+          access_control: "risk-team-credit-officer-rm"
+        },
+        downstream_indexes: ["kyc-documents", "transaction-evidence", "loan-policy-rag", "fraud-alert-evidence"]
+      };
+      $("apiBox").textContent = JSON.stringify(payload, null, 2);
+      return payload;
+    }
+
+    function download(filename, data, type = "application/json") {
+      const blob = new Blob([data], { type });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function seedRetail() {
+      $("customerType").value = "Retail";
+      $("loanType").value = "Home Loan";
+      $("income").value = 185000;
+      $("emi").value = 62000;
+      $("bureau").value = 706;
+      $("ticket").value = 5200000;
+      $("notes").value = "Customer has salary credits and rental expense. One card payment delay 11 months ago, no current delinquency, address proof is current, property document PDF uploaded for review.";
+      analyzeCustomer();
+    }
+
+    $("analyzeBtn").addEventListener("click", () => {
+      const a = analyzeCustomer();
+      addMessage("bot", `Analysis complete. Risk grade ${a.grade}, eligible amount ${money(a.eligible)}, DTI ${Math.round(a.dti * 100)}%, fraud score ${a.fraud}/100.`);
+    });
+
+    $("seedBtn").addEventListener("click", seedRetail);
+    $("sendBtn").addEventListener("click", () => {
+      const text = $("prompt").value.trim() || "Can this customer get the requested loan? Explain risk, KYC gaps, fraud flags and next best action.";
+      addMessage("user", text);
+      addMessage("bot", answer(text));
+      $("prompt").value = "";
+    });
+    $("clearBtn").addEventListener("click", () => {
+      $("chatWindow").innerHTML = "";
+      addMessage("bot", "Session cleared. Upload files or ask for credit risk, fraud/anomaly, KYC, HNI or loan recommendation analysis.");
+    });
+    $("fileInput").addEventListener("change", e => handleFiles(e.target.files));
+    $("apiBtn").addEventListener("click", generateApiPayload);
+    $("copyApiBtn").addEventListener("click", async () => {
+      await navigator.clipboard.writeText($("apiBox").textContent);
+      $("copyApiBtn").textContent = "Copied";
+      setTimeout(() => $("copyApiBtn").textContent = "Copy", 900);
+    });
+    $("downloadKbBtn").addEventListener("click", () => download("banking-ai-dummy-knowledge-base.json", JSON.stringify(kb, null, 2)));
+
+    renderSources();
+    analyzeCustomer();
+    generateApiPayload();
+    addMessage("bot", "Welcome. I can analyze KYC, transaction notes, uploaded files, screenshots/images, fraud signals and loan eligibility using a simulated Agentic RAG + LLM + VLM workflow. Try asking for a loan recommendation or upload a screenshot/document.");
+  </script>
+  <div style="position:fixed;right:16px;bottom:16px;z-index:30"><a href="./index.html#live-apps" style="display:inline-block;padding:11px 16px;background:#073a68;color:#fff;border-radius:9px;text-decoration:none;font:700 13px Arial,sans-serif;box-shadow:0 6px 22px #0002">← WibbleWobble Tech</a></div>
+</body>
+</html>
