@@ -1,22 +1,19 @@
 {
   "name": "wibblewobble-leadflow",
-  "version": "1.0.0",
-  "description": "Website lead capture and Meta WhatsApp Cloud API chatbot with OpenAI and Claude",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Meta WhatsApp Cloud API and website lead backend",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "check": "node --check index.js && node --check flows/flow.js"
   },
-  "engines": {
-    "node": ">=20"
-  },
+  "engines": { "node": ">=20" },
   "dependencies": {
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "helmet": "^8.0.0",
-    "pg": "^8.13.1",
-    "pino": "^9.0.0"
+    "pg": "^8.13.1"
   }
 }
