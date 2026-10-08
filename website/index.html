@@ -1189,6 +1189,22 @@
 
       <div class="apps-grid">
 
+        <!-- Banking AI Credit Risk & Loan Advisor: interactive local demo -->
+        <a href="./banking-ai-credit-risk-loan-agentic-rag-vlm-app.html" target="_blank" rel="noopener noreferrer" class="app-card reveal">
+          <div class="app-thumb" style="background:linear-gradient(135deg,#071b35,#0a4652);">
+            <div class="app-thumb-glow" style="background:radial-gradient(circle at 50% 60%,rgba(12,139,131,.16) 0%,transparent 70%);"></div>
+            <span class="app-thumb-icon">🏦</span>
+            <div class="app-num">14</div>
+            <div class="app-live-badge"><span class="app-live-dot"></span>Demo</div>
+          </div>
+          <div class="app-body">
+            <div class="app-tag">Banking · Credit Risk · Agentic RAG + LLM + VLM</div>
+            <div class="app-title">Banking AI Credit Risk Analyzer &amp; Loan Advisor</div>
+            <p class="app-desc">Explore interactive credit risk scoring, loan suitability, KYC checks, fraud flags, simulated document intelligence and evidence-grounded recommendations. Demonstration with sample policies and data.</p>
+            <span class="app-launch"><i class="fas fa-external-link-alt"></i> Launch Interactive Demo</span>
+          </div>
+        </a>
+
         <!-- App 1: REBOOT -->
         <a href="https://beamish-moonbeam-93a5c7.netlify.app/" target="_blank" rel="noopener" class="app-card reveal">
           <div class="app-thumb">
@@ -1918,9 +1934,9 @@
   </footer>
 
   <!-- WhatsApp Float -->
-  <a href="https://wa.me/919620393657" class="wa-float" target="_blank" title="Chat on WhatsApp">
+  <a href="https://wa.me/919620393657" class="wa-float" target="_blank" rel="noopener noreferrer" title="Message Santanu on WhatsApp (personal contact)" aria-label="Message Santanu directly on WhatsApp">
     <i class="fab fa-whatsapp"></i>
-    <span class="wa-tooltip">Chat on WhatsApp</span>
+    <span class="wa-tooltip">WhatsApp · Personal contact</span>
   </a>
 
   <script>
@@ -2054,6 +2070,10 @@
     #wwt-header .wwt-online { display: flex; align-items: center; gap: 5px; color: #86efac; font-size: 11px; font-weight: 500; }
     #wwt-header .wwt-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: wwt-blink 2s infinite; }
     @keyframes wwt-blink { 0%,100%{opacity:1} 50%{opacity:0.35} }
+    #wwt-human-wa { background:#25D366; color:#063b23; text-decoration:none;
+      font-size:11px; font-weight:800; padding:8px 10px; border-radius:14px; white-space:nowrap; }
+    #wwt-human-wa:hover { background:#8cf5b5; }
+    @media(max-width:390px) { #wwt-human-wa { font-size:10px; padding:6px 7px; } }
     #wwt-close { background: rgba(255,255,255,0.15); border: none; color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0; }
     #wwt-close:hover { background: rgba(255,255,255,0.28); }
     #wwt-messages { flex: 1; overflow-y: auto; padding: 16px 14px; display: flex; flex-direction: column; gap: 10px; background: #f0f4ff; }
@@ -2109,6 +2129,9 @@
           <div class="wwt-htag">Santanu Sarker · WibbleWobble Tech</div>
         </div>
         <div class="wwt-online"><span class="wwt-dot"></span>Online</div>
+        <a id="wwt-human-wa" href="https://wa.me/919620393657?text=Hello%20Santanu%2C%20I%20visited%20WibbleWobble%20Tech%20and%20would%20like%20to%20connect."
+           target="_blank" rel="noopener noreferrer" aria-label="Contact Santanu directly on WhatsApp"
+           title="WhatsApp · personal contact">WhatsApp</a>
         <button id="wwt-close" aria-label="Close">✕</button>
       </div>
       <div class="wwt-progress" id="wwtProgress">
@@ -2141,7 +2164,7 @@
     // Each step: { id, bot (message), options[], freeText, next }
     const FLOW = {
       start: {
-        bot: "Hi! 👋 I'm <strong>Santi</strong>, Santanu's AI assistant.<br><br>I help connect you with the right solution. <strong>What best describes you today?</strong>",
+        bot: "Hi 👋 I'm <strong>Santi</strong>, Santanu's AI assistant for WibbleWobble Tech.<br><br><strong>What best describes you today?</strong>",
         options: [
           { label: "🏢 I run a business / startup", next: 'business_type' },
           { label: "👔 I'm hiring / recruiting",    next: 'hiring' },
@@ -2554,7 +2577,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // WibbleWobble LeadFlow backend.
     // Replace this placeholder after your Node.js backend is deployed.
     // Example: https://api.wibblwwobbleapp.com
-    var API_BASE_URL = 'https://YOUR-BACKEND-DOMAIN';
+    var API_BASE_URL = 'https://my-website2-1-49ig.onrender.com';
 
     var POPUP_DELAY_MS = 20000;
     var EXIT_INTENT_ENABLED = true;
@@ -2632,16 +2655,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function sendBackendEvent(event, extra) {
-      if (!backendConfigured()) return Promise.resolve(null);
-
-      return fetch(API_BASE_URL.replace(/\/$/, '') + '/api/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(backendPayload(event, extra))
-      }).catch(function () {
-        // Tracking must never break the website.
-        return null;
-      });
+      // /api/events is not exposed by the existing Render backend.
+      // Preserve tracking through the configured Google Apps Script hook.
+      send(event, extra || {});
+      return Promise.resolve({ tracked: true });
     }
 
     function sendLeadToBackend(extra) {
