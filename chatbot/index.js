@@ -38,33 +38,44 @@ app.get('/webhook', (req, res) => {
 });
 
 function verifySignature(req, res, next) {
-  if (!APP_SECRET) return res.sendStatus(503);
+  if (!APP_SECRET) { console.error('[webhook] App secret missing'); return res.sendStatus(503); }
   const signature = req.get('x-hub-signature-256') || '';
-  if (!signature.startsWith('sha256=')) return res.sendStatus(403);
+  if (!signature.startsWith('sha256=')) { console.warn('[webhook] Missing signature'); return res.sendStatus(403); }
   const expected = crypto.createHmac('sha256', APP_SECRET).update(req.body).digest('hex');
   const actual = signature.slice(7);
-  if (!/^[a-f0-9]{64}$/i.test(actual) || !crypto.timingSafeEqual(Buffer.from(actual, 'hex'), Buffer.from(expected, 'hex'))) return res.sendStatus(403);
+  if (!/^[a-f0-9]{64}$/i.test(actual) || !crypto.timingSafeEqual(Buffer.from(actual, 'hex'), Buffer.from(expected, 'hex'))) { console.warn('[webhook] Invalid signature'); return res.sendStatus(403); }
   next();
 }
 
-app.post('/webhook', express.raw({ type: 'application/json', limit: '256kb' }), verifySignature, (req, res) => {
-  let body;
-  try { body = JSON.parse(req.body.toString('utf8')); } catch { return res.sendStatus(400); }
-  if (body.object !== 'whatsapp_business_account') return res.sendStatus(200);
-  res.sendStatus(200); // Acknowledge Meta promptly; background work requires a persistent service/queue for production.
-  processWebhook(body).catch((e) => console.error('Webhook processing failed:', e.message));
-});
+app.post('/webhook', express.raw({ type: 'application/json', limit: '256kb' }),
+  (req, res, next) => { console.log('[webhook] POST received'); next(); },
+  verifySignature,
+  (req, res) => {
+    let body;
+    try { body = JSON.parse(req.body.toString('utf8')); }
+    catch { console.warn('[webhook] Invalid JSON'); return res.sendStatus(400); }
+    const changes = (body.entry || []).flatMap(e => e.changes || []);
+    const messageCount = changes.reduce((n, c) => n + (c.value?.messages?.length || 0), 0);
+    console.log('[webhook] Verified', { object: body.object, fields: changes.map(c => c.field), messageCount });
+    if (body.object !== 'whatsapp_business_account') return res.sendStatus(200);
+    res.sendStatus(200); // Acknowledge Meta promptly.
+    processWebhook(body)
+      .then(() => console.log('[webhook] Processing complete'))
+      .catch(e => console.error('[webhook] Processing failed:', e.message));
+  }
+);
 
 async function processWebhook(body) {
   if (!db) throw new Error('DATABASE_URL required');
   for (const entry of body.entry || []) for (const change of entry.changes || []) {
     if (change.field !== 'messages') continue;
     const value = change.value || {};
-    if (value.metadata?.phone_number_id && String(value.metadata.phone_number_id) !== String(PHONE_ID)) continue;
+    if (value.metadata?.phone_number_id && String(value.metadata.phone_number_id) !== String(PHONE_ID)) { console.warn('[webhook] Ignored event for another phone number ID'); continue; }
     for (const msg of value.messages || []) {
       if (!msg.id || !msg.from) continue;
       const text = String(msg.text?.body || msg.button?.text || msg.interactive?.button_reply?.id || msg.interactive?.list_reply?.id || '').trim();
-      if (!text) continue;
+      if (!text) { console.log('[webhook] Skipped non-text message'); continue; }
+      console.log('[webhook] Incoming text message');
       await handleMessage(msg.from, msg.id, text);
     }
   }
@@ -78,13 +89,14 @@ async function sendWhatsApp(to, text) {
     headers: { Authorization: `Bearer ${ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { preview_url: false, body: String(text).slice(0, 4000) } })
   });
-  if (!response.ok) throw new Error(`Meta send failed HTTP ${response.status}: ${(await response.text()).slice(0, 350)}`);
+  if (!response.ok) { console.error('[whatsapp] Send failed HTTP', response.status); throw new Error(`Meta send failed HTTP ${response.status}`); }
+  console.log('[whatsapp] Reply sent successfully');
 }
 
 async function handleMessage(phone, messageId, text) {
   // Atomic message claim prevents processing the same Meta delivery twice.
   const claim = await db.query('INSERT INTO processed_messages (message_id, phone) VALUES ($1,$2) ON CONFLICT DO NOTHING RETURNING message_id', [messageId, phone]);
-  if (!claim.rowCount) return;
+  if (!claim.rowCount) { console.log('[webhook] Duplicate message ignored'); return; }
   try {
     const prior = await db.query('SELECT step, collecting, needs_human FROM whatsapp_sessions WHERE phone=$1', [phone]);
     const session = prior.rows[0] || { step: null, collecting: {}, needs_human: false };
