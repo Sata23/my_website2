@@ -23,6 +23,12 @@ const RESET = /^(menu|restart|start|hi|hello|hey)$/i;
 const HUMAN = /\b(talk to santanu|human|real person|stop bot|agent please)\b/i;
 const pricingChoice = (s) => s.step === 'pricing';
 
+// Render liveness: do not depend on PostgreSQL or external APIs.
+// Configure Render's Health Check Path as /live.
+app.get('/', (_req, res) => res.status(200).json({ service: 'santi-whatsapp-backend', status: 'running' }));
+app.get('/live', (_req, res) => res.status(200).json({ status: 'ok', uptime_seconds: Math.round(process.uptime()) }));
+
+// Database readiness remains a separate diagnostic endpoint.
 app.get('/health', async (_req, res) => {
   if (!db) return res.status(503).json({ status: 'unhealthy', reason: 'DATABASE_URL not configured' });
   try { await db.query('SELECT 1'); res.json({ status: 'ok' }); }
