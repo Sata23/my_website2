@@ -15,7 +15,8 @@ const ORIGIN = process.env.ALLOWED_ORIGIN || process.env.WEBSITE_URL || '';
 const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
 const PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
-const ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
+// Render secrets can accidentally contain a pasted "Bearer " prefix or whitespace.
+const ACCESS_TOKEN = String(process.env.WHATSAPP_ACCESS_TOKEN || '').trim().replace(/^Bearer\s+/i, '').trim();
 const DB_URL = process.env.DATABASE_URL;
 const AI_ENABLED = process.env.AI_ENABLED === 'true';
 const db = DB_URL ? new Pool({ connectionString: DB_URL, max: 3, ssl: process.env.DATABASE_SSL === 'true' ? { rejectUnauthorized: true } : undefined }) : null;
@@ -95,7 +96,19 @@ async function sendWhatsApp(to, text) {
     headers: { Authorization: `Bearer ${ACCESS_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { preview_url: false, body: String(text).slice(0, 4000) } })
   });
-  if (!response.ok) { console.error('[whatsapp] Send failed HTTP', response.status); throw new Error(`Meta send failed HTTP ${response.status}`); }
+  if (!response.ok) {
+    // Log only Meta's diagnostic codes, never tokens, phone numbers or response headers.
+    let code = null, subcode = null, errorType = null, isTransient = null;
+    try {
+      const payload = await response.json();
+      code = payload?.error?.code ?? null;
+      subcode = payload?.error?.error_subcode ?? null;
+      errorType = payload?.error?.type ?? null;
+      isTransient = payload?.error?.is_transient ?? null;
+    } catch { /* Keep HTTP status when Meta's body is not JSON. */ }
+    console.error('[whatsapp] Send rejected', { httpStatus: response.status, metaCode: code, metaSubcode: subcode, errorType, isTransient });
+    throw new Error(`Meta send failed HTTP ${response.status} (code=${code}, subcode=${subcode})`);
+  }
   console.log('[whatsapp] Reply sent successfully');
 }
 
