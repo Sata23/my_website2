@@ -2304,7 +2304,7 @@
         ]
       },
       wa_direct: {
-        bot: "Sure! Send a WhatsApp message directly — Santanu responds within 24 hours.<br><br><a href='" + WA + "' target='_blank' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open WhatsApp</a>",
+        bot: "Opening Santi's WhatsApp test chat. If it didn't open, use the link below. Meta's test number works only for authorized testers and may not support public click-to-chat.<br><br><a href='" + WA + "?text=menu' target='_blank' rel='noopener noreferrer' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open Santi on WhatsApp</a>",
         options: [
           { label: "📅 Book a call instead", next: 'book_direct' },
           { label: "🔁 Start over",          next: 'start' },
@@ -2421,6 +2421,11 @@
     }
 
     function handleOption(opt){
+      // Open WhatsApp in the same user gesture, before any async/chat animation.
+      // This avoids popup blockers on the "WhatsApp instead" button.
+      if (opt.next === 'wa_direct') {
+        window.open(WA + '?text=menu', '_blank', 'noopener,noreferrer');
+      }
       // Store selection for context
       collecting[currentStep] = opt.label;
 
