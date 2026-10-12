@@ -2304,7 +2304,7 @@
         ]
       },
       wa_direct: {
-        bot: "Opening Santi's WhatsApp test chat. If it didn't open, use the link below. Meta's test number works only for authorized testers and may not support public click-to-chat.<br><br><a href='" + WA + "?text=menu' target='_blank' rel='noopener noreferrer' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open Santi on WhatsApp</a>",
+        bot: "To continue on WhatsApp, open the chat and press Send on the prefilled message <strong>menu</strong>. The Meta test number is available only to authorized testers; other visitors can continue using this website chat.<br><br><a href='" + WA + "?text=menu' target='_blank' rel='noopener noreferrer' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open Santi on WhatsApp</a>",
         options: [
           { label: "📅 Book a call instead", next: 'book_direct' },
           { label: "🔁 Start over",          next: 'start' },
@@ -2390,10 +2390,22 @@
     function renderOptions(opts){
       optDiv.innerHTML = '';
       opts.forEach(o => {
-        const b = document.createElement('button');
+        // A real hyperlink reliably hands off to WhatsApp without popup blockers.
+        const isWhatsApp = o.next === 'wa_direct';
+        const b = document.createElement(isWhatsApp ? 'a' : 'button');
         b.className = 'wwt-opt' + (o.highlight ? ' highlight' : '');
         b.textContent = o.label;
-        b.onclick = () => handleOption(o);
+        if (isWhatsApp) {
+          b.href = WA + '?text=' + encodeURIComponent('menu');
+          b.target = '_blank';
+          b.rel = 'noopener noreferrer';
+          b.style.textDecoration = 'none';
+          b.style.display = 'block';
+          b.onclick = () => handleOption(o);
+        } else {
+          b.type = 'button';
+          b.onclick = () => handleOption(o);
+        }
         optDiv.appendChild(b);
       });
     }
@@ -2421,11 +2433,6 @@
     }
 
     function handleOption(opt){
-      // Open WhatsApp in the same user gesture, before any async/chat animation.
-      // This avoids popup blockers on the "WhatsApp instead" button.
-      if (opt.next === 'wa_direct') {
-        window.open(WA + '?text=menu', '_blank', 'noopener,noreferrer');
-      }
       // Store selection for context
       collecting[currentStep] = opt.label;
 
@@ -2497,11 +2504,17 @@
       isOpen = !isOpen;
       win.classList.toggle('open', isOpen);
       badge.style.display = 'none';
-      if(isOpen && !hasOpened){
-        hasOpened = true;
-        setTimeout(()=> goToStep('start'), 300);
+      if(isOpen){
+        // Welcome each newly opened website-chat session, not only the first.
+        // Clearing the UI also avoids stale steps from a previous visitor flow.
+        messages.innerHTML = '';
+        optDiv.innerHTML = '';
+        collecting = {};
+        currentStep = 'start';
+        input.value = '';
+        goToStep('start');
+        input.focus();
       }
-      if(isOpen) input.focus();
     }
 
     // ── EVENT LISTENERS ────────────────────────────────────────
