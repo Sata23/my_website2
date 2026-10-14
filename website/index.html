@@ -2158,6 +2158,8 @@
 
     const AVATAR = 'https://drive.google.com/thumbnail?id=1uHpvUrN3evahC2A-w7s82rZgUkoEqdp3&sz=w200';
     const MEET   = 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ3KKH88CXeUFIKKK2BRKy_xbdGNijGGBzK8AObJi7WrT31lIBDHmZB2l2J8rPKSOBph1Xz1YSMa';
+    // Meta's test number is accessible only to approved testers. Replace this
+    // with the registered production WhatsApp Business number before public launch.
     const WA     = 'https://wa.me/15556363859';
 
     // ── CONVERSATION FLOW ──────────────────────────────────────
@@ -2304,8 +2306,9 @@
         ]
       },
       wa_direct: {
-        bot: "To continue on WhatsApp, open the chat and press Send on the prefilled message <strong>menu</strong>. The Meta test number is available only to authorized testers; other visitors can continue using this website chat.<br><br><a href='" + WA + "?text=menu' target='_blank' rel='noopener noreferrer' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open Santi on WhatsApp</a>",
+        bot: "Santi's WhatsApp number is currently a <strong>Meta test number</strong>. Only approved test recipients can use it. For all other visitors, the website chatbot works here without WhatsApp.<br><br><a href='" + WA + "?text=menu' target='_blank' rel='noopener noreferrer' class='wwt-cta-btn wa'><i class='fab fa-whatsapp'></i> Open WhatsApp (approved testers)</a><br><br>If WhatsApp does not open, select <strong>Continue website chat</strong> below.",
         options: [
+          { label: "💬 Continue website chat", next: 'start' },
           { label: "📅 Book a call instead", next: 'book_direct' },
           { label: "🔁 Start over",          next: 'start' },
         ]
@@ -2390,22 +2393,13 @@
     function renderOptions(opts){
       optDiv.innerHTML = '';
       opts.forEach(o => {
-        // A real hyperlink reliably hands off to WhatsApp without popup blockers.
-        const isWhatsApp = o.next === 'wa_direct';
-        const b = document.createElement(isWhatsApp ? 'a' : 'button');
+        // Website conversation options remain on-page for every visitor.
+        // The actual WhatsApp handoff is a separate, explicit hyperlink in wa_direct.
+        const b = document.createElement('button');
         b.className = 'wwt-opt' + (o.highlight ? ' highlight' : '');
         b.textContent = o.label;
-        if (isWhatsApp) {
-          b.href = WA + '?text=' + encodeURIComponent('menu');
-          b.target = '_blank';
-          b.rel = 'noopener noreferrer';
-          b.style.textDecoration = 'none';
-          b.style.display = 'block';
-          b.onclick = () => handleOption(o);
-        } else {
-          b.type = 'button';
-          b.onclick = () => handleOption(o);
-        }
+        b.type = 'button';
+        b.onclick = () => handleOption(o);
         optDiv.appendChild(b);
       });
     }
@@ -2505,14 +2499,17 @@
       win.classList.toggle('open', isOpen);
       badge.style.display = 'none';
       if(isOpen){
-        // Welcome each newly opened website-chat session, not only the first.
-        // Clearing the UI also avoids stale steps from a previous visitor flow.
+        // Render the greeting immediately on EVERY new widget session.
+        // A synchronous welcome avoids delay, duplicate greeting timers and stale options.
         messages.innerHTML = '';
         optDiv.innerHTML = '';
         collecting = {};
         currentStep = 'start';
         input.value = '';
-        goToStep('start');
+        removeTyping();
+        updateProgress('start');
+        addBotMsg(FLOW.start.bot);
+        renderOptions(FLOW.start.options);
         input.focus();
       }
     }
