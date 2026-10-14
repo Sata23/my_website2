@@ -526,7 +526,7 @@
           <li><a href="/dashboard" style="color:var(--electric);font-weight:700;"><i class="fas fa-terminal"></i> Controller</a></li>
         </ul>
         <div class="nav-cta">
-          <a href="https://wa.me/15556363859" class="btn btn-ghost" target="_blank">
+          <a href="#santi-chat" onclick="if(window.WWTOpenSanti){window.WWTOpenSanti();return false;}" data-wa-test-url="https://wa.me/15556363859" class="btn btn-ghost" target="_blank">
             <i class="fab fa-whatsapp"></i> WhatsApp
           </a>
           <a href="#schedule" class="btn btn-primary" style="background:linear-gradient(135deg,var(--primary),var(--accent));">
@@ -1622,7 +1622,7 @@
         <p class="section-sub">Serious enquiries responded to within 24 hours.</p>
       </div>
       <div class="connect-grid">
-        <a href="https://wa.me/15556363859" target="_blank" class="connect-card whatsapp reveal">
+        <a href="#santi-chat" onclick="if(window.WWTOpenSanti){window.WWTOpenSanti();return false;}" data-wa-test-url="https://wa.me/15556363859" target="_blank" class="connect-card whatsapp reveal">
           <div class="connect-icon"><i class="fab fa-whatsapp"></i></div>
           <div class="connect-name">WhatsApp</div>
           <span class="connect-action">Chat Now <i class="fas fa-arrow-right"></i></span>
@@ -1934,9 +1934,9 @@
   </footer>
 
   <!-- WhatsApp Float -->
-  <a href="https://wa.me/15556363859" class="wa-float" target="_blank" rel="noopener noreferrer" title="Chat with Santi on WhatsApp (Meta test number)" aria-label="Chat with Santi on WhatsApp (authorized testers only)">
+  <a href="#santi-chat" onclick="if(window.WWTOpenSanti){window.WWTOpenSanti();return false;}" data-wa-test-url="https://wa.me/15556363859" class="wa-float" target="_blank" rel="noopener noreferrer" title="Chat with Santi on WhatsApp (Meta test number)" aria-label="Chat with Santi on WhatsApp (authorized testers only)">
     <i class="fab fa-whatsapp"></i>
-    <span class="wa-tooltip">Santi WhatsApp · Test number</span>
+    <span class="wa-tooltip">Chat with Santi · Website assistant</span>
   </a>
 
   <script>
@@ -2342,6 +2342,7 @@
     let currentStep = 'start';
     let collecting  = {};
     let hasOpened   = false;
+    let chatEpoch = 0; // Discard delayed replies after closing/restarting a chat.
 
     // ── REFS ───────────────────────────────────────────────────
     const fab      = document.getElementById('wwt-fab');
@@ -2417,9 +2418,11 @@
       optDiv.innerHTML = '';
       showTyping();
 
-      // Simulate thinking delay
+      // Ignore stale delayed messages if the visitor closes or restarts.
+      const epoch = chatEpoch;
       const delay = userLabel ? 700 + Math.random()*400 : 300;
       setTimeout(() => {
+        if (!isOpen || epoch !== chatEpoch) return;
         removeTyping();
         addBotMsg(step.bot);
         if(step.options && step.options.length) renderOptions(step.options);
@@ -2460,7 +2463,19 @@
       optDiv.innerHTML = '';
       showTyping();
 
-      const t = text.toLowerCase();
+      const t = text.toLowerCase().trim();
+      if (/^(hi|hello|hey|menu|restart|start)$/.test(t)) {
+        chatEpoch++;
+        messages.innerHTML = '';
+        optDiv.innerHTML = '';
+        collecting = {};
+        currentStep = 'start';
+        removeTyping();
+        addBotMsg(FLOW.start.bot);
+        renderOptions(FLOW.start.options);
+        return;
+      }
+      const epoch = chatEpoch;
       let nextStep = 'booking';
 
       // Smart keyword routing
@@ -2475,6 +2490,7 @@
       else if(/hire|hiring|job|role|recruit|salary/i.test(t)) nextStep = 'hiring';
       else if(/price|cost|rate|fee|how much/i.test(t)){
         setTimeout(()=>{
+          if (!isOpen || epoch !== chatEpoch) return;
           removeTyping();
           addBotMsg("My typical engagement packages:<br><br>💼 <strong>MVP Build</strong>: From $3,000 (30–60 days)<br>🔄 <strong>Monthly Retainer</strong>: From $2,000/mo<br>🔍 <strong>Technical Consult</strong>: $75/hr<br>☎️ <strong>Discovery Call</strong>: Free!<br><br>The best way to get an accurate quote is a quick call.");
           renderOptions([
@@ -2487,6 +2503,7 @@
       }
 
       setTimeout(()=>{
+        if (!isOpen || epoch !== chatEpoch) return;
         removeTyping();
         goToStep(nextStep, null);
         // Remove the duplicate user message since goToStep won't add one here
@@ -2495,6 +2512,7 @@
 
     // ── TOGGLE ─────────────────────────────────────────────────
     function toggle(){
+      chatEpoch++;
       isOpen = !isOpen;
       win.classList.toggle('open', isOpen);
       badge.style.display = 'none';
@@ -2515,6 +2533,8 @@
     }
 
     // ── EVENT LISTENERS ────────────────────────────────────────
+    // Public browser chatbot works regardless of Meta test-recipient restrictions.
+    window.WWTOpenSanti = function () { if (!isOpen) toggle(); };
     fab.addEventListener('click', toggle);
     document.getElementById('wwt-close').addEventListener('click', toggle);
     document.getElementById('wwt-send').addEventListener('click', ()=> handleFreeText(input.value));
